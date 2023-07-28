@@ -70,7 +70,8 @@ class App(ctk.CTk):
             folha["D1"] = "Genero"
             folha["E1"] = "Endereço"
             folha["F1"] = "Email"
-            folha["G1"] = "Observações"
+            folha["G1"] = "Plano"
+            folha["H1"] = "Observações"
 
             ficheiro.save("Clientes.xlsx")
 
@@ -79,9 +80,9 @@ class App(ctk.CTk):
             # pegando os dados dos entrys
             name = name_value.get()
             phone = phone_value.get()
-            age = calendar_date
             age = age_value.get()
             gender = gender_combobox.get()
+            plan = plan_combobox.get()
             adress = adress_value.get()
             email = email_value.get()
             obs = obs_entry.get(0.0, END)
@@ -102,7 +103,8 @@ class App(ctk.CTk):
                 folha.cell(column=4, row=folha.max_row, value=gender)
                 folha.cell(column=5, row=folha.max_row, value=adress)
                 folha.cell(column=6, row=folha.max_row, value=email)
-                folha.cell(column=7, row=folha.max_row, value=obs)
+                folha.cell(column=7, row=folha.max_row, value=plan)
+                folha.cell(column=8, row=folha.max_row, value=obs)
 
                 ficheiro.save(r"Clientes.xlsx")
                 messagebox.showinfo("Sistema", "Dados Salvos com Sucesso!")
@@ -115,8 +117,7 @@ class App(ctk.CTk):
             email_value.set("")
             obs_entry.delete(0.0, END)
 
-            # test variables
-
+        # test variables
         name_value = StringVar()
         phone_value = StringVar()
         age_value = StringVar()
@@ -127,21 +128,21 @@ class App(ctk.CTk):
         name_entry = ctk.CTkEntry(
             self,
             textvariable=name_value,
-            width=350,
+            width=390,
             font=("Century Gothic", 16),
             fg_color="transparent",
         )
         contact_entry = ctk.CTkEntry(
             self,
             textvariable=phone_value,
-            width=200,
+            width=150,
             font=("Century Gothic", 16),
             fg_color="transparent",
         )
         age_entry = ctk.CTkEntry(
             self,
             textvariable=age_value,
-            width=150,
+            width=140,
             font=("Century Gothic", 16),
             fg_color="transparent",
         )
@@ -159,16 +160,6 @@ class App(ctk.CTk):
             font=("Century Gothic", 16),
             fg_color="transparent",
         )
-        calendar_date = DateEntry(
-            self,
-            selectmode="day",
-            year=2023,
-            width=12,
-            font=("Century Gothic", 12),
-            background="teal",
-            foreground="white",
-            borderwidth=3,
-        )
         # Combo box
         gender_combobox = ctk.CTkComboBox(
             self,
@@ -176,6 +167,13 @@ class App(ctk.CTk):
             font=("Century Gothic", 14),
         )
         gender_combobox.set("Feminino")
+        # Combo box plano
+        plan_combobox = ctk.CTkComboBox(
+            self,
+            values=["Mensal", "Trimestral", "Semestral", "Anual", "Básico"],
+            font=("Century Gothic", 14),
+        )
+        plan_combobox.set("Mensal")
 
         # Entrada de observações
         obs_entry = ctk.CTkTextbox(
@@ -235,6 +233,12 @@ class App(ctk.CTk):
             font=("Century Gothic", 16),
             text_color=["#000", "#fff"],
         )
+        lb_plan = ctk.CTkLabel(
+            self,
+            text="Plano:",
+            font=("Century Gothic", 16),
+            text_color=["#000", "#fff"],
+        )
         lb_email = ctk.CTkLabel(
             self,
             text="Email:",
@@ -252,8 +256,8 @@ class App(ctk.CTk):
         lb_name.place(x=50, y=120)
         name_entry.place(x=50, y=150)
 
-        lb_contact.place(x=450, y=120)
-        contact_entry.place(x=450, y=150)
+        lb_contact.place(x=500, y=120)
+        contact_entry.place(x=500, y=150)
 
         lb_age.place(x=300, y=190)
         age_entry.place(x=300, y=220)
@@ -262,11 +266,14 @@ class App(ctk.CTk):
         lb_gender.place(x=500, y=190)
         gender_combobox.place(x=500, y=220)
 
-        lb_adress.place(x=50, y=260)  # 260
-        adress_entry.place(x=50, y=290)  # 290
+        lb_plan.place(x=300, y=260)
+        plan_combobox.place(x=300, y=290)
 
-        lb_email.place(x=50, y=190)  # 190
-        email_entry.place(x=50, y=220)  # 220
+        lb_adress.place(x=50, y=260)
+        adress_entry.place(x=50, y=290)
+
+        lb_email.place(x=50, y=190)
+        email_entry.place(x=50, y=220)
 
         lb_obs.place(x=50, y=330)
         obs_entry.place(x=50, y=360)

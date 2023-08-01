@@ -5,7 +5,7 @@ from tkinter import messagebox
 import openpyxl, xlrd
 import pathlib
 from openpyxl import Workbook, workbook
-from tkcalendar import Calendar, DateEntry
+from tkcalendar import DateEntry
 
 # Setando a aparencia do sistema
 ctk.set_appearance_mode("System")
@@ -20,7 +20,7 @@ class App(ctk.CTk):
         self.todo_sistema()
 
     def layout_config(self):
-        self.title("Sistema de Gestão de Clientes - Nutricionista Karina Macaco")
+        self.title("Sistema de Gestão de Clientes - Nutricionista Karina Szeibl")
         self.geometry("700x500")
 
     def apperence(self):
@@ -67,11 +67,12 @@ class App(ctk.CTk):
             folha["A1"] = "Nome Completo"
             folha["B1"] = "Telefone"
             folha["C1"] = "Idade"
-            folha["D1"] = "Genero"
-            folha["E1"] = "Endereço"
-            folha["F1"] = "Email"
-            folha["G1"] = "Plano"
-            folha["H1"] = "Observações"
+            folha["D1"] = "CPF"
+            folha["E1"] = "Genero"
+            folha["F1"] = "Endereço"
+            folha["G1"] = "Email"
+            folha["H1"] = "Plano"
+            folha["I1"] = "Observações"
 
             ficheiro.save("Clientes.xlsx")
 
@@ -81,6 +82,7 @@ class App(ctk.CTk):
             name = name_value.get()
             phone = phone_value.get()
             age = age_value.get()
+            cpf = cpf_value.get()
             gender = gender_combobox.get()
             plan = plan_combobox.get()
             adress = adress_value.get()
@@ -100,14 +102,16 @@ class App(ctk.CTk):
                 folha.cell(column=1, row=folha.max_row + 1, value=name)
                 folha.cell(column=2, row=folha.max_row, value=phone)
                 folha.cell(column=3, row=folha.max_row, value=age)
-                folha.cell(column=4, row=folha.max_row, value=gender)
-                folha.cell(column=5, row=folha.max_row, value=adress)
-                folha.cell(column=6, row=folha.max_row, value=email)
-                folha.cell(column=7, row=folha.max_row, value=plan)
-                folha.cell(column=8, row=folha.max_row, value=obs)
+                folha.cell(column=4, row=folha.max_row, value=cpf)
+                folha.cell(column=5, row=folha.max_row, value=gender)
+                folha.cell(column=6, row=folha.max_row, value=adress)
+                folha.cell(column=7, row=folha.max_row, value=email)
+                folha.cell(column=8, row=folha.max_row, value=plan)
+                folha.cell(column=9, row=folha.max_row, value=obs)
 
                 ficheiro.save(r"Clientes.xlsx")
                 messagebox.showinfo("Sistema", "Dados Salvos com Sucesso!")
+                clear()
 
         def clear():
             name_value.set("")
@@ -115,6 +119,7 @@ class App(ctk.CTk):
             age_value.set("")
             adress_value.set("")
             email_value.set("")
+            cpf_value.set("")
             obs_entry.delete(0.0, END)
 
         # test variables
@@ -123,6 +128,7 @@ class App(ctk.CTk):
         age_value = StringVar()
         adress_value = StringVar()
         email_value = StringVar()
+        cpf_value = StringVar()
 
         # Entrys
         name_entry = ctk.CTkEntry(
@@ -146,6 +152,13 @@ class App(ctk.CTk):
             font=("Century Gothic", 16),
             fg_color="transparent",
         )
+        cpf_entry = ctk.CTkEntry(
+            self,
+            textvariable=cpf_value,
+            width=140,
+            font=("Century Gothic", 16),
+            fg_color="transparent",
+        )
         adress_entry = ctk.CTkEntry(
             self,
             textvariable=adress_value,
@@ -165,6 +178,7 @@ class App(ctk.CTk):
             self,
             values=["Masculino", "Feminino", "Outro"],
             font=("Century Gothic", 14),
+            state="readonly", 
         )
         gender_combobox.set("Feminino")
         # Combo box plano
@@ -172,6 +186,7 @@ class App(ctk.CTk):
             self,
             values=["Mensal", "Trimestral", "Semestral", "Anual", "Básico"],
             font=("Century Gothic", 14),
+            state="readonly", 
         )
         plan_combobox.set("Mensal")
 
@@ -202,6 +217,14 @@ class App(ctk.CTk):
             hover_color="#333",
         ).place(x=525, y=465)
 
+        # button_find = ctk.CTkButton(
+        # self,
+        # text="Localizar Cadastro".upper(),
+        # #command=find_cadastro,
+        # fg_color="#222",
+        # hover_color="#111",
+        # ).place(x=210, y=465)  
+
         # Labels
         lb_name = ctk.CTkLabel(
             self,
@@ -211,13 +234,19 @@ class App(ctk.CTk):
         )
         lb_contact = ctk.CTkLabel(
             self,
-            text="Telefone para contato:",
+            text="Contato:",
             font=("Century Gothic", 16),
             text_color=["#000", "#fff"],
         )
         lb_age = ctk.CTkLabel(
             self,
             text="Data de nascimento:",
+            font=("Century Gothic", 16),
+            text_color=["#000", "#fff"],
+        )
+        lb_cpf = ctk.CTkLabel(
+            self,
+            text="CPF:",
             font=("Century Gothic", 16),
             text_color=["#000", "#fff"],
         )
@@ -261,10 +290,12 @@ class App(ctk.CTk):
 
         lb_age.place(x=300, y=190)
         age_entry.place(x=300, y=220)
-        # calendar_date.place(x=300, y=220)
 
-        lb_gender.place(x=500, y=190)
-        gender_combobox.place(x=500, y=220)
+        lb_cpf.place(x=500, y=190)
+        cpf_entry.place(x=500,y=220)
+
+        lb_gender.place(x=500, y=260)
+        gender_combobox.place(x=500, y=290)
 
         lb_plan.place(x=300, y=260)
         plan_combobox.place(x=300, y=290)

@@ -17,6 +17,78 @@ import platform
 ctk.set_appearance_mode("System")
 ctk.set_default_color_theme("blue")
 
+class EditDialog(Toplevel):
+    def __init__(self, parent, client_data):
+        super().__init__(parent)
+        self.title("Editar Cliente")
+        self.geometry("400x300")
+        self.transient(parent)
+
+        self.client_data = client_data
+
+        self.lb_name = Label(self, text="Nome Completo:")
+        self.name_entry = Entry(self, width=40)
+        self.lb_name.grid(row=0, column=0, padx=10, pady=10)
+        self.name_entry.grid(row=0, column=1, padx=10, pady=10)
+        self.name_entry.insert(0, client_data[0])  # Set the initial value
+
+        self.lb_phone = Label(self, text="Telefone:")
+        self.phone_entry = Entry(self, width=20)
+        self.lb_phone.grid(row=1, column=0, padx=10, pady=10)
+        self.phone_entry.grid(row=1, column=1, padx=10, pady=10)
+        self.phone_entry.insert(0, client_data[1])  # Set the initial value
+
+        # Add similar widgets for other client attributes (age, gender, plan, etc.)
+
+        self.save_button = Button(self, text="Salvar", command=self.save_changes)
+        self.save_button.grid(row=10, columnspan=2, pady=20)
+
+    
+    def save_changes(self):
+        new_name = self.name_entry.get()
+        new_phone = self.phone_entry.get()
+
+        updated_client_data = (new_name, new_phone, *self.client_data[2:])
+
+        ficheiro = openpyxl.load_workbook("Clientes.xlsx")
+        folha = ficheiro.active
+
+        rows = list(folha.iter_rows(min_row=2, values_only=True))  # Lê as linhas em uma lista
+
+        for idx, row in enumerate(rows):
+            if row[1] == self.client_data[1]:
+                rows[idx] = updated_client_data  # Substitui a tupla inteira pela nova lista
+
+        # Limpa o conteúdo da folha
+        for row in folha.iter_rows(min_row=2, max_row=folha.max_row, min_col=1, max_col=len(self.client_data)):
+            for cell in row:
+                cell.value = None
+
+        # Preenche a folha com as novas linhas atualizadas
+        for idx, updated_row in enumerate(rows, start=2):
+            for col_idx, value in enumerate(updated_row, start=1):
+                folha.cell(row=idx, column=col_idx, value=value)
+
+        ficheiro.save("Clientes.xlsx")
+        messagebox.showinfo("Cliente Atualizado", "As informações do cliente foram atualizadas com sucesso.")
+        self.destroy()
+
+class SearchDialog(Toplevel):
+    def __init__(self, parent, search_callback):
+        super().__init__(parent)
+        self.title("Localizar Cliente")
+        self.geometry("400x150")
+        self.transient(parent)
+
+        self.label = Label(self, text="Digite o número de telefone do cliente:")
+        self.label.pack(pady=10)
+
+        self.phone_entry = Entry(self)
+        self.phone_entry.pack()
+
+        self.search_button = Button(self, text="Buscar", command=lambda: search_callback(self.phone_entry.get()))
+        self.search_button.pack(pady=10)
+
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
@@ -41,6 +113,23 @@ class App(ctk.CTk):
         self.opt_apm = ctk.CTkOptionMenu(
             self, values=["Light", "Dark", "System"], command=self.change_apm
         ).place(x=50, y=465)
+    
+    def open_search_dialog(self):
+        search_dialog = SearchDialog(self, self.find_client)
+        self.wait_window(search_dialog)
+
+    def find_client(self, phone):
+        ficheiro = openpyxl.load_workbook("Clientes.xlsx")
+        folha = ficheiro.active
+
+        for row in folha.iter_rows(min_row=2, values_only=True):
+            if row[1] == phone:  # Assuming phone number is in the second column
+                edit_dialog = EditDialog(self, row)  # Pass the client data to the edit dialog
+                self.wait_window(edit_dialog)
+                return
+
+        messagebox.showinfo("Cliente não encontrado", "Nenhum cliente encontrado com este número de telefone.")
+
 
     def change_apm(self, nova_aparencia):
         ctk.set_appearance_mode(nova_aparencia)
@@ -271,13 +360,13 @@ class App(ctk.CTk):
             hover_color="#333",
         ).place(x=525, y=465)
 
-        # button_find = ctk.CTkButton(
-        #     self,
-        #     text="Localizar Cadastro".upper(),
-        #     command=self.abrir_janela_busca,  # Use self.open_search_dialog aqui
-        #     fg_color="#222",
-        #     hover_color="#111",
-        # ).place(x=210, y=465)
+        button_find = ctk.CTkButton(
+            self,
+            text="Localizar Cadastro".upper(),
+            command=self.open_search_dialog,
+            fg_color="#222",
+            hover_color="#111",
+        ).place(x=210, y=465)
 
         # Labels
         lb_name = ctk.CTkLabel(

@@ -6,6 +6,8 @@ import openpyxl, xlrd
 import pathlib
 from openpyxl import Workbook, workbook
 from tkcalendar import DateEntry
+from dateutil.relativedelta import relativedelta
+from datetime import datetime
 
 # Setando a aparencia do sistema
 ctk.set_appearance_mode("System")
@@ -34,7 +36,7 @@ class App(ctk.CTk):
             self, text="Tema", bg_color="transparent", text_color=["#000", "#fff"]
         ).place(x=50, y=440)
         self.opt_apm = ctk.CTkOptionMenu(
-            self, values=["Dark", "Light", "System"], command=self.change_apm
+            self, values=["Light", "Dark", "System"], command=self.change_apm
         ).place(x=50, y=465)
 
     def change_apm(self, nova_aparencia):
@@ -78,7 +80,9 @@ class App(ctk.CTk):
             folha["F1"] = "Endereço"
             folha["G1"] = "Email"
             folha["H1"] = "Plano"
-            folha["I1"] = "Observações"
+            folha["I1"] = "Data Inicio"
+            folha["J1"] = "Data Fim"
+            folha["K1"] = "Observações"
 
             ficheiro.save("Clientes.xlsx")
 
@@ -91,9 +95,10 @@ class App(ctk.CTk):
             cpf = cpf_value.get()
             gender = gender_combobox.get()
             plan = plan_combobox.get()
+            dt_inicio = dt_inicio_value.get()
             adress = adress_value.get()
             email = email_value.get()
-            obs = obs_entry.get(0.0, END)
+            obs = obs_value.get()
 
             if (
                 name == "" or phone == "" or email == ""
@@ -113,7 +118,25 @@ class App(ctk.CTk):
                 folha.cell(column=6, row=folha.max_row, value=adress)
                 folha.cell(column=7, row=folha.max_row, value=email)
                 folha.cell(column=8, row=folha.max_row, value=plan)
-                folha.cell(column=9, row=folha.max_row, value=obs)
+                folha.cell(column=9, row=folha.max_row, value=dt_inicio)
+                folha.cell(column=11, row=folha.max_row, value=obs)
+
+                dt_inicio_date = datetime.strptime(dt_inicio, "%d/%m/%Y")  # Converter para objeto de data e hora
+                plan_durations = {
+                    "Mensal": 1,
+                    "Trimestral": 3,
+                    "Semestral": 6,
+                    "Anual": 12,
+                    "Básico": 1  # Você precisa determinar a duração correta para o plano "Básico"
+                }
+                selected_plan_duration = plan_durations[plan]
+                
+                # Calcular data de término usando a relativedelta
+                dt_fim_date = dt_inicio_date + relativedelta(months=selected_plan_duration)
+                dt_fim = dt_fim_date.strftime("%d/%m/%Y")  # Converter de volta para string
+
+                folha.cell(column=10, row=folha.max_row, value=dt_fim)
+                
 
                 ficheiro.save(r"Clientes.xlsx")
                 messagebox.showinfo("Sistema", "Dados Salvos com Sucesso!")
@@ -126,7 +149,8 @@ class App(ctk.CTk):
             adress_value.set("")
             email_value.set("")
             cpf_value.set("")
-            obs_entry.delete(0.0, END)
+            obs_value.set("")
+            dt_inicio_value.set("")
 
         # test variables
         name_value = StringVar()
@@ -135,6 +159,8 @@ class App(ctk.CTk):
         adress_value = StringVar()
         email_value = StringVar()
         cpf_value = StringVar()
+        obs_value = StringVar()
+        dt_inicio_value = StringVar()
 
         # Entrys
         name_entry = ctk.CTkEntry(
@@ -161,7 +187,7 @@ class App(ctk.CTk):
         cpf_entry = ctk.CTkEntry(
             self,
             textvariable=cpf_value,
-            width=140,
+            width=150,
             font=("Century Gothic", 16),
             fg_color="transparent",
         )
@@ -193,17 +219,26 @@ class App(ctk.CTk):
             values=["Mensal", "Trimestral", "Semestral", "Anual", "Básico"],
             font=("Century Gothic", 14),
             state="readonly", 
+            width= 150
         )
         plan_combobox.set("Mensal")
 
         # Entrada de observações
-        obs_entry = ctk.CTkTextbox(
+        obs_entry = ctk.CTkEntry(
             self,
-            width=600,
+            textvariable=obs_value,
+            width=398,
             height=75,
             font=("arial", 12),
             border_color="#aaa",
             border_width=2,
+            fg_color="transparent",
+        )
+        dt_inicio_entry = ctk.CTkEntry(
+            self,
+            textvariable=dt_inicio_value,
+            width=150,
+            font=("Century Gothic", 16),
             fg_color="transparent",
         )
 
@@ -286,6 +321,12 @@ class App(ctk.CTk):
             font=("Century Gothic", 16),
             text_color=["#000", "#fff"],
         )
+        lb_dt_inicio = ctk.CTkLabel(
+            self,
+            text="Data Inicio:",
+            font=("Century Gothic", 16),
+            text_color=["#000", "#fff"],
+        )
 
         # Posicionando na tela
         lb_name.place(x=50, y=120)
@@ -300,11 +341,11 @@ class App(ctk.CTk):
         lb_cpf.place(x=500, y=190)
         cpf_entry.place(x=500,y=220)
 
-        lb_gender.place(x=500, y=260)
-        gender_combobox.place(x=500, y=290)
+        lb_gender.place(x=300, y=260)
+        gender_combobox.place(x=300, y=290)
 
-        lb_plan.place(x=300, y=260)
-        plan_combobox.place(x=300, y=290)
+        lb_plan.place(x=500, y=260)
+        plan_combobox.place(x=500, y=290)
 
         lb_adress.place(x=50, y=260)
         adress_entry.place(x=50, y=290)
@@ -314,6 +355,9 @@ class App(ctk.CTk):
 
         lb_obs.place(x=50, y=330)
         obs_entry.place(x=50, y=360)
+
+        lb_dt_inicio.place(x=500, y=330)
+        dt_inicio_entry.place(x=500, y=360)
 
 
 if __name__ == "__main__":

@@ -8,11 +8,14 @@ from openpyxl import Workbook, workbook
 from tkcalendar import DateEntry
 from dateutil.relativedelta import relativedelta
 from datetime import datetime
+from tkinter import Toplevel
+import os
+from tkinter import filedialog
+import platform
 
 # Setando a aparencia do sistema
 ctk.set_appearance_mode("System")
 ctk.set_default_color_theme("blue")
-
 
 class App(ctk.CTk):
     def __init__(self):
@@ -41,7 +44,7 @@ class App(ctk.CTk):
 
     def change_apm(self, nova_aparencia):
         ctk.set_appearance_mode(nova_aparencia)
-
+    
     def todo_sistema(self):
         frame = ctk.CTkFrame(
             self,
@@ -98,7 +101,7 @@ class App(ctk.CTk):
             dt_inicio = dt_inicio_value.get()
             adress = adress_value.get()
             email = email_value.get()
-            obs = obs_value.get()
+            obs = obs_value.get()           
 
             if (
                 name == "" or phone == "" or email == ""
@@ -120,6 +123,16 @@ class App(ctk.CTk):
                 folha.cell(column=8, row=folha.max_row, value=plan)
                 folha.cell(column=9, row=folha.max_row, value=dt_inicio)
                 folha.cell(column=11, row=folha.max_row, value=obs)
+
+                dt_inicio = dt_inicio_value.get()
+                try:
+                    dt_inicio_date = datetime.strptime(dt_inicio, "%d/%m/%Y")
+                except ValueError:
+                    messagebox.showerror(
+                        "Erro de Data",
+                        "Formato de data inválido para Data Inicio. Use o formato DD/MM/AAAA.",
+                    )
+                    return
 
                 dt_inicio_date = datetime.strptime(dt_inicio, "%d/%m/%Y")  # Converter para objeto de data e hora
                 plan_durations = {
@@ -250,7 +263,7 @@ class App(ctk.CTk):
             fg_color="#151",
             hover_color="#131",
         ).place(x=375, y=465)
-        button_submit = ctk.CTkButton(
+        button_clear = ctk.CTkButton(
             self,
             text="Limpar Campos".upper(),
             command=clear,
@@ -259,12 +272,12 @@ class App(ctk.CTk):
         ).place(x=525, y=465)
 
         # button_find = ctk.CTkButton(
-        # self,
-        # text="Localizar Cadastro".upper(),
-        # #command=find_cadastro,
-        # fg_color="#222",
-        # hover_color="#111",
-        # ).place(x=210, y=465)  
+        #     self,
+        #     text="Localizar Cadastro".upper(),
+        #     command=self.abrir_janela_busca,  # Use self.open_search_dialog aqui
+        #     fg_color="#222",
+        #     hover_color="#111",
+        # ).place(x=210, y=465)
 
         # Labels
         lb_name = ctk.CTkLabel(

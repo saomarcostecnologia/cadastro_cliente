@@ -21,7 +21,7 @@ class EditDialog(Toplevel):
     def __init__(self, parent, client_data):
         super().__init__(parent)
         self.title("Editar Cliente")
-        self.geometry("400x300")
+        self.geometry("700x550")
         self.transient(parent)
 
         self.client_data = client_data
@@ -38,17 +38,128 @@ class EditDialog(Toplevel):
         self.phone_entry.grid(row=1, column=1, padx=10, pady=10)
         self.phone_entry.insert(0, client_data[1])  # Set the initial value
 
+        self.lb_age = Label(self, text="Data de Nascimento:")
+        self.age_entry = Entry(self, width=20)
+        self.lb_age.grid(row=2, column=0, padx=10, pady=10)
+        self.age_entry.grid(row=2, column=1, padx=10, pady=10)
+        self.age_entry.insert(0, client_data[2])  # Set the initial value
+
+        self.lb_cpf = Label(self, text="CPF:")
+        self.cpf_entry = Entry(self, width=20)
+        self.lb_cpf.grid(row=3, column=0, padx=10, pady=10)
+        self.cpf_entry.grid(row=3, column=1, padx=10, pady=10)
+        self.cpf_entry.insert(0, client_data[3])  # Set the initial value
+
+        self.lb_gender = Label(self, text="Gênero:")
+        self.gender_combobox = ctk.CTkComboBox(
+            self,
+            values=["Feminino", "Masculino", "Outro"],
+            font=("Century Gothic", 14),
+            state="readonly", 
+            width=150
+        )
+        self.lb_gender.grid(row=4, column=0, padx=10, pady=10)
+        self.gender_combobox.grid(row=4, column=1, padx=10, pady=10)
+        self.gender_combobox.set(client_data[4])  # Set the initial value
+
+        self.lb_adress = Label(self, text="Endereço:")
+        self.adress_entry = Entry(self, width=20)
+        self.lb_adress.grid(row=5, column=0, padx=10, pady=10)
+        self.adress_entry.grid(row=5, column=1, padx=10, pady=10)
+        self.adress_entry.insert(0, client_data[5])  # Set the initial value
+
+        self.lb_email = Label(self, text="Email:")
+        self.email_entry = Entry(self, width=20)
+        self.lb_email.grid(row=6, column=0, padx=10, pady=10)
+        self.email_entry.grid(row=6, column=1, padx=10, pady=10)
+        self.email_entry.insert(0, client_data[6])  # Set the initial value
+
+        self.lb_plan = Label(self, text="Plano:")
+        self.plan_combobox = ctk.CTkComboBox(
+            self,
+            values=["Mensal", "Trimestral", "Semestral", "Anual", "Básico"],
+            font=("Century Gothic", 14),
+            state="readonly", 
+            width=150
+        )
+        self.lb_plan.grid(row=7, column=0, padx=10, pady=10)
+        self.plan_combobox.grid(row=7, column=1, padx=10, pady=10)
+        self.plan_combobox.set(client_data[7])  # Set the initial value
+
+        self.lb_dt_inicio = Label(self, text="Data Inicio:")
+        self.lb_dt_inicio.grid(row=8, column=0, padx=10, pady=10)
+
+        self.dt_inicio_entry = Entry(self, width=20)
+        self.dt_inicio_entry.grid(row=8, column=1, padx=10, pady=10)
+        self.dt_inicio_entry.insert(0, client_data[8])  # Set the initial value
+
+        self.lb_dt_fim = Label(self, text="Data Fim:")
+        self.dt_fim_entry = Entry(self, width=20)
+        self.lb_dt_fim.grid(row=9, column=0, padx=10, pady=10)
+        self.dt_fim_entry.grid(row=9, column=1, padx=10, pady=10)
+        self.dt_fim_entry.insert(0, client_data[9])  # Set the initial value
+
+        self.lb_obs = Label(self, text="Observações:")
+        self.obs_entry = Entry(self, width=20)
+        self.lb_obs.grid(row=10, column=0, padx=10, pady=10)
+        self.obs_entry.grid(row=10, column=1, padx=10, pady=10)
+        self.obs_entry.insert(0, client_data[10])  # Set the initial value
+
         # Add similar widgets for other client attributes (age, gender, plan, etc.)
 
         self.save_button = Button(self, text="Salvar", command=self.save_changes)
-        self.save_button.grid(row=10, columnspan=2, pady=20)
+        self.save_button.grid(row=0, column=2, padx=20, pady=20)
+
 
     
     def save_changes(self):
         new_name = self.name_entry.get()
         new_phone = self.phone_entry.get()
+        new_age = self.age_entry.get()
+        new_cpf = self.cpf_entry.get()
+        new_gender = self.gender_combobox.get()
+        new_adress = self.adress_entry.get()
+        new_email = self.email_entry.get()
+        new_plan = self.plan_combobox.get()
+        new_dt_inicio = self.dt_inicio_entry.get() 
+        new_obs = self.obs_entry.get()
 
-        updated_client_data = (new_name, new_phone, *self.client_data[2:])
+         # Lógica para calcular a nova data de fim baseada no plano e na nova data de início
+        plan_durations = {
+            "Mensal": 1,
+            "Trimestral": 3,
+            "Semestral": 6,
+            "Anual": 12,
+            "Básico": 1  # Você precisa determinar a duração correta para o plano "Básico"
+        }
+        selected_plan_duration = plan_durations[new_plan]
+
+        try:
+            dt_inicio_date = datetime.strptime(new_dt_inicio, "%d/%m/%Y")
+        except ValueError:
+            messagebox.showerror(
+                "Erro de Data",
+                "Formato de data inválido para Data Inicio. Use o formato DD/MM/AAAA.",
+            )
+            return
+
+        dt_fim_date = dt_inicio_date + relativedelta(months=selected_plan_duration)
+        new_dt_fim = dt_fim_date.strftime("%d/%m/%Y")
+
+        updated_client_data = (
+        new_name,
+        new_phone,
+        new_age,
+        new_cpf,
+        new_gender,
+        new_adress,
+        new_email,
+        new_plan,
+        new_dt_inicio,
+        new_dt_fim,  # Nova data de fim calculada
+        new_obs,
+        *self.client_data[11:],)
+        
 
         ficheiro = openpyxl.load_workbook("Clientes.xlsx")
         folha = ficheiro.active

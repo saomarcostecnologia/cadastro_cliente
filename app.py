@@ -217,6 +217,17 @@ class App(ctk.CTk):
         y_offset = (self.winfo_screenheight() - height) // 2
         self.geometry(f"{width}x{height}+{x_offset}+{y_offset}")
 
+    # Comentado versão windows, fiquei com preguiça de fazer validação de sistema
+    
+    # def layout_config(self):
+    #     self.title("Sistema de Gestão de Clientes - Nutricionista Karina Szeibl")
+    #     width = 700  # Defina o valor desejado para a largura
+    #     height = 520  # Defina o valor desejado para a altura
+    #     x_offset = (self.winfo_screenwidth() - width) // 2
+    #     y_offset = (self.winfo_screenheight() - height) // 2
+    #     self.geometry(f"{width}x{height}+{x_offset}+{y_offset}")
+    #     self.resizable(False, False)  # Impede que a janela seja redimensionada
+
     def apperence(self):
         self.lb_apm = ctk.CTkLabel(
             self, text="Tema", bg_color="transparent", text_color=["#000", "#fff"]

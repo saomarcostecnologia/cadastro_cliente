@@ -11,7 +11,6 @@ from datetime import datetime
 from tkinter import Toplevel
 import os
 from tkinter import filedialog
-import platform
 
 # Setando a aparencia do sistema
 ctk.set_appearance_mode("System")
@@ -191,13 +190,13 @@ class SearchDialog(Toplevel):
         self.geometry("400x150")
         self.transient(parent)
 
-        self.label = Label(self, text="Digite o número de telefone do cliente:")
+        self.label = Label(self, text="Digite o nome completo do cliente:")
         self.label.pack(pady=10)
 
-        self.phone_entry = Entry(self)
-        self.phone_entry.pack()
+        self.name_entry = Entry(self)
+        self.name_entry.pack()
 
-        self.search_button = Button(self, text="Buscar", command=lambda: search_callback(self.phone_entry.get()))
+        self.search_button = Button(self, text="Buscar", command=lambda: search_callback(self.name_entry.get()))
         self.search_button.pack(pady=10)
 
 class App(ctk.CTk):
@@ -240,17 +239,17 @@ class App(ctk.CTk):
         search_dialog = SearchDialog(self, self.find_client)
         self.wait_window(search_dialog)
 
-    def find_client(self, phone):
+    def find_client(self, name):
         ficheiro = openpyxl.load_workbook("Clientes.xlsx")
         folha = ficheiro.active
 
         for row in folha.iter_rows(min_row=2, values_only=True):
-            if row[1] == phone:  # Assuming phone number is in the second column
+            if row[0] == name:  # Assuming phone number is in the second column
                 edit_dialog = EditDialog(self, row)  # Pass the client data to the edit dialog
                 self.wait_window(edit_dialog)
                 return
 
-        messagebox.showinfo("Cliente não encontrado", "Nenhum cliente encontrado com este número de telefone.")
+        messagebox.showinfo("Cliente não encontrado", "Nenhum cliente encontrado com este nome.")
 
 
     def change_apm(self, nova_aparencia):
@@ -312,7 +311,29 @@ class App(ctk.CTk):
             dt_inicio = dt_inicio_value.get()
             adress = adress_value.get()
             email = email_value.get()
-            obs = obs_value.get()           
+            obs = obs_value.get()
+
+            # Verificar campos vazios e atribuir "null"
+            if name == "":
+                name = "None"
+            if phone == "":
+                phone = "None"
+            if age == "":
+                age = "None"
+            if cpf == "":
+                cpf = "None"
+            if gender == "":
+                gender = "None"
+            if plan == "":
+                plan = "None"
+            if dt_inicio == "":
+                dt_inicio = "None"
+            if adress == "":
+                adress = "None"
+            if email == "":
+                email = "None"
+            if obs == "":
+                obs = "None"           
 
             if (
                 name == "" or phone == "" or email == ""
